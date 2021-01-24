@@ -1,23 +1,28 @@
 import { Component } from 'react';
-import { ImSearch } from 'react-icons/im';
+import PropTypes from 'prop-types';
+//import { ImSearch } from 'react-icons/im';
 import { toast } from 'react-toastify';
 import s from './Searchbar.module.css';
 
 
 export default class PokemonForm extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func,
+  };
+  
   state = {
     query: '',
   };
 
-  // handleNameChange = event => {
-  //   this.setState({ pokemonName: event.currentTarget.value.toLowerCase() });
-  // };
+  handleQueryChange = event => {
+    this.setState({ query: event.currentTarget.value.toLowerCase() });
+  };
 
   handleSubmit = event => {
     event.preventDefault();
 
     if (this.state.query.trim() === '') {
-      toast.error('Введите что-то.');
+      toast.error("Введите что-то.");
       return;
     }
 
@@ -36,9 +41,12 @@ export default class PokemonForm extends Component {
               <input
                  className={s.SearchFormInput}
                  type="text"
+                 name="query"
+                 value={this.state.query}
+                 onChange={this.handleQueryChange}
                  autoComplete="off"
                  autoFocus
-                 placeholder="Search images and photos"
+                 placeholder="Search images and photos from Pixabay"
               />
            </form>
       </header>

@@ -23,3 +23,8 @@
 .Button:focus {
   background-color: #303f9f;
 }
+
+.ButtonSection {
+  margin-left: auto;
+  margin-right: auto;
+}

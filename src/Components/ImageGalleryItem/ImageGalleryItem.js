@@ -1,17 +1,16 @@
 import s from './ImageGalleryItem.module.css';
 import PropTypes from 'prop-types';
 
-const ImageGalleryItem = () => (
-     <div>
-        <li className={s.ImageGalleryItem}>
-            <img src="" alt="" className={s.ImageGalleryItemImage} />
-        </li>
+const ImageGalleryItem = ({src, alt}) => (
+    <div className={s.ImageGalleryItem}>
+        <img src={src} alt={alt} className={s.ImageGalleryItemImage} />
     </div>
 )
 
 ImageGalleryItem.propTypes = {
-//   onRemoveContact: PropTypes.func,
-//   contacts: PropTypes.arrayOf(PropTypes.object),
+    src: PropTypes.string,
+    alt: PropTypes.string,
+    
 };
 
 export default ImageGalleryItem;

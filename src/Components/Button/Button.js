@@ -1,7 +1,7 @@
 import s from './Button.module.css';
 
 const Button = () => (
-    <div>
+    <div className={s.ButtonSection}>
         <button className={s.Button}>Load more</button>
     </div>
 )
