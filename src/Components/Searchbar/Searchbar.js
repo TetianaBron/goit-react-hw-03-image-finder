@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import s from './Searchbar.module.css';
 
 
-export default class PokemonForm extends Component {
+export default class Searchbar extends Component {
   static propTypes = {
     onSubmit: PropTypes.func,
   };

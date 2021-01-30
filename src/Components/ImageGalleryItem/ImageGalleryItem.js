@@ -9,7 +9,7 @@ const ImageGalleryItem = ({src, alt}) => (
 
 ImageGalleryItem.propTypes = {
     src: PropTypes.string,
-    alt: PropTypes.string,
+    alt: PropTypes.string.isRequired,
     
 };
 
