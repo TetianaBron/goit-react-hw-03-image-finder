@@ -21,39 +21,46 @@ export default class ImageGallery extends Component {
     };
     
     state = {
-        item: [],
+        items: [],
         error: null,
         status: Status.IDLE,
         page: 1
     };
 
-    incrementPage = () => {
-        this.state.page += 1;
-        this.setState({ status: Status.PENDING })
-        pixabayAPI
+    fetch = () => {
+     pixabayAPI
             .fetchImg(this.props.query, this.state.page)
-             .then(item => this.setState({ item, status: Status.RESOLVED }))
-                .catch(error => this.setState({ error, status: Status.REJECTED }))
+            .then(items => this.setState(prevState => ({
+          items: [...prevState.items, ...items.hits],
+          status: Status.RESOLVED,})))
+            .catch(error => this.setState({ error, status: Status.REJECTED }))
+        .finally(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      });
+}
+    
+    incrementPage = () => {
+        this.setState(prevState => ({ page: (prevState.page += 1) }));
+        this.fetch();
     }
     
     resetPage = () => {
-        this.state.page = 1;
+        this.setState({ page: 1 });
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.query !== this.props.query) {
-            this.setState({ status: Status.PENDING })
+            this.setState({ status: Status.PENDING, items: []})
             this.resetPage();
-            pixabayAPI
-                .fetchImg(this.props.query, this.state.page)  
-                .then(item => this.setState({ item, status: Status.RESOLVED }))
-                .catch(error => this.setState({ error, status: Status.REJECTED }))
+            this.fetch();
        }
-       
     }
     
     render() {
-        const { item, error, status } = this.state;
+        const { items, error, status } = this.state;
 
         if (status === 'idle') {
             return <></>
@@ -77,19 +84,19 @@ export default class ImageGallery extends Component {
         }
 
         if (status === 'resolved') {
-            if (item.hits.length > 0) {
+            if (items.length > 0) {
                 return (
                     <>
                         <ul className={s.ImageGallery}>
-                            {item.hits.map(({ id, webformatURL, tags }) => (
-                                <li key={id}>
+                            {items.map(({ webformatURL, tags }, index) => (
+                                <li key={index}>
                                     <ImageGalleryItem
                                         src={webformatURL}
                                         alt={tags} />
                                 </li>
                             ))}
                         </ul>
-                        { item.hits.length > 11 && <Button onIncrement={this.incrementPage} />}
+                        { items.length > 11 && <Button onIncrement={() => this.incrementPage()} />}
                     </>
                 )
             } else {
