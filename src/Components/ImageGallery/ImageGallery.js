@@ -6,6 +6,14 @@ import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import Button from '../Button/Button';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
+import pixabayAPI from '../../services/pixabay-api';
+
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
 
 export default class ImageGallery extends Component {
     static propTypes = {
@@ -13,19 +21,35 @@ export default class ImageGallery extends Component {
     };
     
     state = {
-        item: null,
+        item: [],
         error: null,
-        status: 'idle'
+        status: Status.IDLE,
+        page: 1
     };
+
+    incrementPage = () => {
+        this.state.page += 1;
+        this.setState({ status: Status.PENDING })
+        pixabayAPI
+            .fetchImg(this.props.query, this.state.page)
+             .then(item => this.setState({ item, status: Status.RESOLVED }))
+                .catch(error => this.setState({ error, status: Status.REJECTED }))
+    }
+    
+    resetPage = () => {
+        this.state.page = 1;
+    }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.query !== this.props.query) {
-            this.setState({ status: 'pending' })
-                fetch(`https://pixabay.com/api/?q=${this.props.query}&page=1&key=19207978-b8cc5d5178f1c84e5ac39b1c7&image_type=photo&orientation=horizontal&per_page=12`)
-                .then(response => response.json())
-                .then(item => this.setState({ item, status: 'resolved' }))
-                .catch(error => this.setState({ error, status: 'rejected' }))
+            this.setState({ status: Status.PENDING })
+            this.resetPage();
+            pixabayAPI
+                .fetchImg(this.props.query, this.state.page)  
+                .then(item => this.setState({ item, status: Status.RESOLVED }))
+                .catch(error => this.setState({ error, status: Status.REJECTED }))
        }
+       
     }
     
     render() {
@@ -43,7 +67,7 @@ export default class ImageGallery extends Component {
                          color="#00BFFF"
                          height={260}
                          width={260}
-                        timeout={3000}
+                         timeout={3000}
                     />
                  </div>)
         }
@@ -53,7 +77,7 @@ export default class ImageGallery extends Component {
         }
 
         if (status === 'resolved') {
-            if (item.total > 0) {
+            if (item.hits.length > 0) {
                 return (
                     <>
                         <ul className={s.ImageGallery}>
@@ -65,7 +89,7 @@ export default class ImageGallery extends Component {
                                 </li>
                             ))}
                         </ul>
-                        <Button />
+                        { item.hits.length > 11 && <Button onIncrement={this.incrementPage} />}
                     </>
                 )
             } else {
