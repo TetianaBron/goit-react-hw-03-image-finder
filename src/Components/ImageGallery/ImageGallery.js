@@ -35,9 +35,8 @@ export default class ImageGallery extends Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.query !== this.props.query) {
-            this.setState({ status: Status.PENDING, items: [] });
-            this.resetPage();
+        if (prevProps.query !== this.props.query ) {
+            this.setState({ status: Status.PENDING, items: [], page: 1 });
             this.fetch()
        }
     }
@@ -47,7 +46,7 @@ export default class ImageGallery extends Component {
             .fetchImg(this.props.query, this.state.page)
             .then(items => this.setState(prevState => ({
           items: [...prevState.items, ...items.hits],
-          status: Status.RESOLVED,})))
+          status: Status.RESOLVED, page: (prevState.page += 1)})))
             .catch(error => this.setState({ error, status: Status.REJECTED }))
         .finally(() => {
         window.scrollTo({
@@ -55,15 +54,6 @@ export default class ImageGallery extends Component {
           behavior: 'smooth',
         });
       });
-    }
-    
-    resetPage = () => {
-        this.setState({ page: 1 });
-    }
-
-    incrementPage = () => {
-        this.setState(prevState => ({ page: (prevState.page += 1) }));
-        this.fetch();
     }
     
     toggleModal = () => {
@@ -123,7 +113,7 @@ export default class ImageGallery extends Component {
                                 image={largeImage}
                                 onClose={this.toggleModal}
                             />}
-                        {items.length > 11 && <Button onIncrement={() => this.incrementPage()} />}
+                        {items.length > 11  && <Button onIncrement={() => this.fetch()} />}
                     </>
                 )
             } else {

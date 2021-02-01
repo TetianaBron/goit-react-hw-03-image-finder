@@ -12,16 +12,3 @@ const api = {
 };
 
 export default api;
-
-// function incrementPage(page) {
-//     page += 1;
-//     fetchImg()
-//   }
-
-// export default incrementPage;
-      
-// function resetPage() {
-//     page = 1;
-// }
-  
-// export default resetPage;

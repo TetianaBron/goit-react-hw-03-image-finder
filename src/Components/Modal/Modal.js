@@ -6,7 +6,11 @@ import PropTypes from "prop-types";
 const modalRoot = document.querySelector('#modal-root');
 
 export default class Modal extends Component {
-    
+    static propTypes = {
+        image: PropTypes.object,
+        onClose: PropTypes.func,
+    };
+
     componentDidMount() {
         window.addEventListener('keydown', this.handleKeyDown);
     }
@@ -39,9 +43,3 @@ export default class Modal extends Component {
             modalRoot);
     }
 }
-
-Modal.propTypes = {
-  image: PropTypes.object,
-  onClose: PropTypes.func,
-};
- 
