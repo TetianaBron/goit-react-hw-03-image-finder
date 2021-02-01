@@ -34,19 +34,25 @@ export default class ImageGallery extends Component {
         },
     };
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
         if (prevProps.query !== this.props.query ) {
-            this.setState({ status: Status.PENDING, items: [], page: 1 });
-            this.fetch()
+            this.setState({ items: [], page: 1 });
+            this.fetch(this.props.query, 1);
        }
     }
 
-    fetch = () => {
+    fetch = (query, page) => {
+        this.setState({ status: Status.PENDING });
+
      pixabayAPI
-            .fetchImg(this.props.query, this.state.page)
-            .then(items => this.setState(prevState => ({
-          items: [...prevState.items, ...items.hits],
-          status: Status.RESOLVED, page: (prevState.page += 1)})))
+            .fetchImg(query, page)
+            .then(items =>
+              this.setState(prevState => ({
+                 items: [...prevState.items, ...items.hits],
+                  status: Status.RESOLVED,
+                  page: prevState.page + 1,
+              })),
+            )
             .catch(error => this.setState({ error, status: Status.REJECTED }))
         .finally(() => {
         window.scrollTo({
@@ -113,7 +119,7 @@ export default class ImageGallery extends Component {
                                 image={largeImage}
                                 onClose={this.toggleModal}
                             />}
-                        {items.length > 11  && <Button onIncrement={() => this.fetch()} />}
+                        {items.length > 11  && <Button onIncrement={() => this.fetch(this.props.query, this.state.page)} />}
                     </>
                 )
             } else {
