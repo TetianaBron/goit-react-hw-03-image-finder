@@ -7,6 +7,7 @@ import Button from '../Button/Button';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
 import pixabayAPI from '../../services/pixabay-api';
+import Modal from '../Modal/Modal';
 
 const Status = {
   IDLE: 'idle',
@@ -24,8 +25,22 @@ export default class ImageGallery extends Component {
         items: [],
         error: null,
         status: Status.IDLE,
-        page: 1
+        page: 1,
+        showModal: false,
+
+        largeImage: {
+            src: "",
+            alt: "",
+        },
     };
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.query !== this.props.query) {
+            this.setState({ status: Status.PENDING, items: [] });
+            this.resetPage();
+            this.fetch()
+       }
+    }
 
     fetch = () => {
      pixabayAPI
@@ -40,27 +55,32 @@ export default class ImageGallery extends Component {
           behavior: 'smooth',
         });
       });
-}
-    
-    incrementPage = () => {
-        this.setState(prevState => ({ page: (prevState.page += 1) }));
-        this.fetch();
     }
     
     resetPage = () => {
         this.setState({ page: 1 });
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.query !== this.props.query) {
-            this.setState({ status: Status.PENDING, items: []})
-            this.resetPage();
-            this.fetch();
-       }
+    incrementPage = () => {
+        this.setState(prevState => ({ page: (prevState.page += 1) }));
+        this.fetch();
     }
     
+    toggleModal = () => {
+        this.setState(({showModal}) => ({
+            showModal: !showModal
+        }))
+    }
+
+    clickOnItem = (src, alt) => {
+            this.setState({
+                largeImage: { src, alt },
+            });
+            this.toggleModal();
+    }
+
     render() {
-        const { items, error, status } = this.state;
+        const { items, error, status, showModal, largeImage} = this.state;
 
         if (status === 'idle') {
             return <></>
@@ -87,16 +107,23 @@ export default class ImageGallery extends Component {
             if (items.length > 0) {
                 return (
                     <>
-                        <ul className={s.ImageGallery}>
-                            {items.map(({ webformatURL, tags }, index) => (
+                          <ul className={s.ImageGallery}>
+                            {items.map(({ webformatURL, largeImageURL, tags}, index) => (
                                 <li key={index}>
                                     <ImageGalleryItem
-                                        src={webformatURL}
-                                        alt={tags} />
+                                        webformatURL={webformatURL}
+                                        largeImageURL={largeImageURL}
+                                        tags={tags}
+                                        clickOnItem={() => this.clickOnItem(largeImageURL, tags)}/>
                                 </li>
                             ))}
-                        </ul>
-                        { items.length > 11 && <Button onIncrement={() => this.incrementPage()} />}
+                          </ul>
+                        {showModal &&
+                            <Modal
+                                image={largeImage}
+                                onClose={this.toggleModal}
+                            />}
+                        {items.length > 11 && <Button onIncrement={() => this.incrementPage()} />}
                     </>
                 )
             } else {

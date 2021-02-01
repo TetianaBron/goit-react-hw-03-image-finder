@@ -1,16 +1,20 @@
 import s from './ImageGalleryItem.module.css';
 import PropTypes from 'prop-types';
 
-const ImageGalleryItem = ({src, alt}) => (
+const ImageGalleryItem = ({webformatURL, tags, clickOnItem}) => (
     <div className={s.ImageGalleryItem}>
-        <img src={src} alt={alt} className={s.ImageGalleryItemImage} />
+        <img
+            src={webformatURL}
+            alt={tags}
+            onClick={clickOnItem}
+            className={s.ImageGalleryItemImage} />
     </div>
 )
 
 ImageGalleryItem.propTypes = {
-    src: PropTypes.string,
-    alt: PropTypes.string.isRequired,
-    
+    webformatURL: PropTypes.string,
+    tags: PropTypes.string.isRequired,
+    clickOnItem: PropTypes.func,
 };
 
 export default ImageGalleryItem;

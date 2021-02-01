@@ -5,7 +5,6 @@ import Layout from './Components/Layout/Layout';
 import Searchbar from './Components/Searchbar/Searchbar';
 import ImageGallery from './Components/ImageGallery/ImageGallery';
 
-    
 export default class App extends Component {
 
     static propTypes = {
@@ -22,7 +21,7 @@ export default class App extends Component {
     };
 
     render() {
-       
+        
         return ( 
             <Layout>
                 <Searchbar onSubmit={this.handleFormSubmit} />
