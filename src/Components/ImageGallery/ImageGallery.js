@@ -34,9 +34,9 @@ export default class ImageGallery extends Component {
         },
     };
 
-    componentDidUpdate(prevProps) {
+    async componentDidUpdate(prevProps) {
         if (prevProps.query !== this.props.query ) {
-            this.setState({ items: [], page: 1 });
+            await this.setState({ items: [], page: 1 });
             this.fetch(this.props.query, 1);
        }
     }
