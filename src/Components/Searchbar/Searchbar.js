@@ -45,7 +45,7 @@ export default class Searchbar extends Component {
                  onChange={this.handleQueryChange}
                  autoComplete="off"
                  autoFocus
-                 placeholder="Search images and photos"
+                 placeholder="Search pictures from Pixabay..."
               />
            </form>
       </header>

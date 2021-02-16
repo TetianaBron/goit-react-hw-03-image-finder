@@ -9,6 +9,8 @@ import Loader from "react-loader-spinner";
 import pixabayAPI from '../../services/pixabay-api';
 import Modal from '../Modal/Modal';
 
+const perPage = 12;
+
 export default class ImageGallery extends Component {
     static propTypes = {
     query: PropTypes.string.isRequired,
@@ -16,6 +18,7 @@ export default class ImageGallery extends Component {
     
     state = {
         items: [],
+        total: null,
         error: null,
         loading: false,
         page: 1,
@@ -26,27 +29,32 @@ export default class ImageGallery extends Component {
             alt: "",
         },
     };
-
+    
     async componentDidUpdate(prevProps) {
         if (prevProps.query !== this.props.query ) {
             await this.setState({ items: [], page: 1 });
             this.fetch(this.props.query);
        }
     }
+  
+   
 
     fetch = (query) => {
         this.setState({ loading: true });
 
         pixabayAPI
-            .fetchImg(query, this.state.page)
+            .fetchImg(query, this.state.page, perPage)
             .then((items) => {
                 if (items.total === 0) {
                     toast.error(`${query} is not found. Try another one!`);
+                } else if (this.state.page === 1) {
+                    toast.error(`${items.total} pictures is found.`)
                 }
                 this.setState(prevState => ({
                     items: [...prevState.items, ...items.hits],
+                    total: items.total,
                     page: prevState.page + 1,
-                }));
+                }))
             })
             .catch(error => {
                  toast.error(error.message);
@@ -79,7 +87,8 @@ export default class ImageGallery extends Component {
     }
 
     render() {
-        const { items, showModal, loading, largeImage} = this.state;
+        const { items, showModal, loading, largeImage, page, total } = this.state;
+        const numberOfPages = total / perPage;
  
         return (
         <>
@@ -107,12 +116,12 @@ export default class ImageGallery extends Component {
                 </div>)}
                                 
             {showModal &&
-                    (<Modal
-                                image={largeImage}
-                                onClose={this.toggleModal}
+                (<Modal
+                            image={largeImage}
+                            onClose={this.toggleModal}
                     />)}
                             
-            {items.length > 11 && !loading && (<Button onIncrement={() => this.handleButtonClick()} />)}
+            {page - 1 < numberOfPages && !loading && (<Button onIncrement={() => this.handleButtonClick()} />)}
         </>
         )    
     }
