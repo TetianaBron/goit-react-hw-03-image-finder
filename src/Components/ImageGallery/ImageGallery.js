@@ -112,7 +112,7 @@ export default class ImageGallery extends Component {
                                 onClose={this.toggleModal}
                     />)}
                             
-            {items.length > 11 && (<Button onIncrement={() => this.handleButtonClick()} />)}
+            {items.length > 11 && !loading && (<Button onIncrement={() => this.handleButtonClick()} />)}
         </>
         )    
     }
