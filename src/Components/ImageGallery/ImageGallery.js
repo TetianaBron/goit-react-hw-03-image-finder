@@ -9,13 +9,6 @@ import Loader from "react-loader-spinner";
 import pixabayAPI from '../../services/pixabay-api';
 import Modal from '../Modal/Modal';
 
-const Status = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  RESOLVED: 'resolved',
-  REJECTED: 'rejected',
-};
-
 export default class ImageGallery extends Component {
     static propTypes = {
     query: PropTypes.string.isRequired,
@@ -24,7 +17,7 @@ export default class ImageGallery extends Component {
     state = {
         items: [],
         error: null,
-        status: Status.IDLE,
+        loading: false,
         page: 1,
         showModal: false,
 
@@ -37,29 +30,35 @@ export default class ImageGallery extends Component {
     async componentDidUpdate(prevProps) {
         if (prevProps.query !== this.props.query ) {
             await this.setState({ items: [], page: 1 });
-            this.fetch(this.props.query, 1);
+            this.fetch(this.props.query);
        }
     }
 
-    fetch = (query, page) => {
-        this.setState({ status: Status.PENDING });
+    fetch = (query) => {
+        this.setState({ loading: true });
 
-     pixabayAPI
-            .fetchImg(query, page)
-            .then(items =>
-              this.setState(prevState => ({
-                 items: [...prevState.items, ...items.hits],
-                  status: Status.RESOLVED,
-                  page: prevState.page + 1,
-              })),
-            )
-            .catch(error => this.setState({ error, status: Status.REJECTED }))
-        .finally(() => {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      });
+        pixabayAPI
+            .fetchImg(query, this.state.page)
+            .then((items) => {
+                if (items.total === 0) {
+                    toast.error(`${query} is not found. Try another one!`);
+                }
+                this.setState(prevState => ({
+                    items: [...prevState.items, ...items.hits],
+                    page: prevState.page + 1,
+                }));
+            })
+            .catch(error => {
+                 toast.error(error.message);
+                 this.setState({ error: error.message });
+            })
+         .finally(() => {
+             this.setState({ loading: false });
+             window.scrollTo({
+                 top: document.documentElement.scrollHeight,
+                 behavior: 'smooth',
+            });
+         });
     }
     
     toggleModal = () => {
@@ -68,7 +67,11 @@ export default class ImageGallery extends Component {
         }))
     }
 
-    clickOnItem = (src, alt) => {
+    handleButtonClick = () => {
+        this.fetch(this.props.query);
+    }
+    
+    handleGalleryItemClick = (src, alt) => {
             this.setState({
                 largeImage: { src, alt },
             });
@@ -76,56 +79,43 @@ export default class ImageGallery extends Component {
     }
 
     render() {
-        const { items, error, status, showModal, largeImage} = this.state;
+        const { items, showModal, loading, largeImage} = this.state;
+ 
+        return (
+        <>
+            {loading && 
+                (<div className={s.Loader}>
+                         <Loader
+                            type="ThreeDots"
+                            color="#3f51b5"
+                            height={80}
+                            width={80}
+                            timeout={3000}
+                         />
+                </div>)}
 
-        if (status === 'idle') {
-            return <></>
-        }
-
-        if (status === 'pending') {
-            return (
-                <div className={s.Loader}>
-                    <Loader
-                         type="Puff"
-                         color="#00BFFF"
-                         height={260}
-                         width={260}
-                         timeout={3000}
-                    />
-                 </div>)
-        }
-
-        if (status === 'rejected') {
-            return toast.error(`${error.message}`)
-        }
-
-        if (status === 'resolved') {
-            if (items.length > 0) {
-                return (
-                    <>
-                          <ul className={s.ImageGallery}>
-                            {items.map(({ webformatURL, largeImageURL, tags}, index) => (
-                                <li key={index}>
-                                    <ImageGalleryItem
-                                        webformatURL={webformatURL}
-                                        largeImageURL={largeImageURL}
-                                        tags={tags}
-                                        clickOnItem={() => this.clickOnItem(largeImageURL, tags)}/>
-                                </li>
-                            ))}
-                          </ul>
-                        {showModal &&
-                            <Modal
+            {items.length > 0 &&
+                (<ul className={s.ImageGallery}>
+                {items.map(({ webformatURL, largeImageURL, tags }, index) => (
+                        <li key={index}>
+                          <ImageGalleryItem
+                              webformatURL={webformatURL}
+                              largeImageURL={largeImageURL}
+                              tags={tags}
+                              clickOnItem={() => this.handleGalleryItemClick(largeImageURL, tags)} />
+                        </li>))}
+                </ul>)}
+                                
+            {showModal &&
+                    (<Modal
                                 image={largeImage}
                                 onClose={this.toggleModal}
-                            />}
-                        {items.length > 11  && <Button onIncrement={() => this.fetch(this.props.query, this.state.page)} />}
-                    </>
-                )
-            } else {
-                return <p className={s.MessageNotFound}><span className={s.Query}>{this.props.query}</span> is not found.</p>;
-            }
-        }
+                    />)}
+                            
+            {items.length > 11 && (<Button onIncrement={() => this.handleButtonClick()} />)}
+
+        </>
+        )    
     }
 }
             

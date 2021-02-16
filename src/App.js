@@ -7,11 +7,6 @@ import ImageGallery from './components/ImageGallery/ImageGallery';
 
 export default class App extends Component {
 
-    static propTypes = {
-    };
-
-    static defaultProps = {};
-
     state = {
         query: '',
     };
