@@ -3,6 +3,7 @@ import s from './Modal.module.css';
 import { createPortal } from 'react-dom';
 import PropTypes from "prop-types";
 import Spinner from '../Spinner/Spinner';
+import Img from '../../images/No_Image-512.webp';
 
 const modalRoot = document.querySelector('#modal-root');
 
@@ -55,7 +56,7 @@ export default class Modal extends Component {
                         
                     <img
                         onLoad={this.onLoad}
-                        src={src}
+                        src={src ? src : Img}
                         alt={alt} />
                 </div>
             </div>
