@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import s from './Modal.module.css';
 import { createPortal } from 'react-dom';
 import PropTypes from "prop-types";
+import Loader from "react-loader-spinner";
 
 const modalRoot = document.querySelector('#modal-root');
 
@@ -10,6 +11,10 @@ export default class Modal extends Component {
         image: PropTypes.object,
         onClose: PropTypes.func,
     };
+
+    state = {   
+        isLoading: true,
+    }; 
 
     componentDidMount() {
         window.addEventListener('keydown', this.handleKeyDown);
@@ -30,16 +35,37 @@ export default class Modal extends Component {
             this.props.onClose();
         }
     }
+    onLoad = () => {
+        this.setState({ isLoading: false });
+    }
 
     render() {
         const { src, alt } = this.props.image;
+        const { isLoading } = this.state;
         
         return createPortal(
+            <>
             <div className={s.Overlay} onClick={this.handleBackdropClick}>
-                <div className={s.Modal}>
-                    <img src={src} alt={alt} />
+                    <div className={s.Modal}>
+                         
+                     {isLoading && (
+                     <div className={s.Loader}>
+                         <Loader
+                            type="ThreeDots"
+                            color="#3f51b5"
+                            height={80}
+                            width={80}
+                            timeout={3000}
+                         />
+                      </div>)}
+                        
+                    <img
+                        onLoad={this.onLoad}
+                        src={src}
+                        alt={alt} />
                 </div>
-            </div>,
+                </div>
+            </>,
             modalRoot);
     }
 }

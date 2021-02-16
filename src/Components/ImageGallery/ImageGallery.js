@@ -83,17 +83,6 @@ export default class ImageGallery extends Component {
  
         return (
         <>
-            {loading && 
-                (<div className={s.Loader}>
-                         <Loader
-                            type="ThreeDots"
-                            color="#3f51b5"
-                            height={80}
-                            width={80}
-                            timeout={3000}
-                         />
-                </div>)}
-
             {items.length > 0 &&
                 (<ul className={s.ImageGallery}>
                 {items.map(({ webformatURL, largeImageURL, tags }, index) => (
@@ -104,7 +93,18 @@ export default class ImageGallery extends Component {
                               tags={tags}
                               clickOnItem={() => this.handleGalleryItemClick(largeImageURL, tags)} />
                         </li>))}
-                </ul>)}
+                    </ul>)}
+                
+            {loading && 
+                (<div className={s.Loader}>
+                         <Loader
+                            type="ThreeDots"
+                            color="#3f51b5"
+                            height={80}
+                            width={80}
+                            timeout={3000}
+                         />
+                </div>)}
                                 
             {showModal &&
                     (<Modal
@@ -113,7 +113,6 @@ export default class ImageGallery extends Component {
                     />)}
                             
             {items.length > 11 && (<Button onIncrement={() => this.handleButtonClick()} />)}
-
         </>
         )    
     }

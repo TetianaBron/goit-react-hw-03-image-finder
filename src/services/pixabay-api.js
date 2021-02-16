@@ -4,7 +4,7 @@ function fetchImg(query, page) {
   const perPage = 12;
   
     return fetch(`${BASE_URL}/?q=${query}&page=${page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`)
-      .then(response => response.json());
+    .then(response => response.json())
 }
 
 const api = {
