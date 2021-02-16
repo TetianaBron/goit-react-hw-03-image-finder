@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import Button from '../Button/Button';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import Loader from "react-loader-spinner";
+import Spinner from '../Spinner/Spinner';
 import pixabayAPI from '../../services/pixabay-api';
 import Modal from '../Modal/Modal';
 
@@ -104,21 +104,12 @@ export default class ImageGallery extends Component {
                         </li>))}
                     </ul>)}
                 
-            {loading && 
-                (<div className={s.Loader}>
-                         <Loader
-                            type="ThreeDots"
-                            color="#3f51b5"
-                            height={80}
-                            width={80}
-                            timeout={3000}
-                         />
-                </div>)}
+            {loading && <Spinner/>}
                                 
             {showModal &&
                 (<Modal
-                            image={largeImage}
-                            onClose={this.toggleModal}
+                        image={largeImage}
+                        onClose={this.toggleModal}
                     />)}
                             
             {page - 1 < numberOfPages && !loading && (<Button onIncrement={() => this.handleButtonClick()} />)}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import s from './Modal.module.css';
 import { createPortal } from 'react-dom';
 import PropTypes from "prop-types";
-import Loader from "react-loader-spinner";
+import Spinner from '../Spinner/Spinner';
 
 const modalRoot = document.querySelector('#modal-root');
 
@@ -46,25 +46,19 @@ export default class Modal extends Component {
         return createPortal(
             <>
             <div className={s.Overlay} onClick={this.handleBackdropClick}>
-                    <div className={s.Modal}>
+                <div className={s.Modal}>
                          
-                     {isLoading && (
-                     <div className={s.Loader}>
-                         <Loader
-                            type="ThreeDots"
-                            color="#3f51b5"
-                            height={80}
-                            width={80}
-                            timeout={3000}
-                         />
-                      </div>)}
+                        {isLoading && (
+                            <div className={s.SpinnerCentered}>
+                                <Spinner />
+                            </div>)}
                         
                     <img
                         onLoad={this.onLoad}
                         src={src}
                         alt={alt} />
                 </div>
-                </div>
+            </div>
             </>,
             modalRoot);
     }
